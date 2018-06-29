@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Header, Icon, Popup, Button, Grid, Modal, Image } from 'semantic-ui-react';
 import { Link, withRouter } from "react-router-dom";
-import Occurrence from './Occurrence';
 import axios from 'axios';
 
 

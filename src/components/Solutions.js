@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Label, Button, Grid, Icon, Header, Image, Card } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { withRouter } from "react-router-dom";
+import { withRouter } from 'react-router-dom';
+import Spinner from 'react-spinkit';
 import axios from 'axios';
 
 class Solutions extends Component {
@@ -15,7 +16,9 @@ class Solutions extends Component {
       occTitle: this.props.location.state.occTitle || '',
       occImage: this.props.location.state.occImage || '',
       upvoteColor: "grey",
-      downvoteColor: "grey"
+      downvoteColor: "grey",
+      loading: true,
+      upvoteExists: false
     };
     this.handleDownvote = this.handleDownvote.bind(this);
     this.handleUpvote = this.handleUpvote.bind(this);
@@ -25,6 +28,7 @@ class Solutions extends Component {
     axios.get('http://localhost:5050/solutions/' + this.state.idSolution)
       .then( (response) => {
         this.setState({
+          loading: false,
           downvotes: response.data.downvotes,
           openDate: response.data.openDate,
           deadline: response.data.deadline,
@@ -39,20 +43,70 @@ class Solutions extends Component {
       .catch( (error) => {
         console.log(error);
       });
+    axios.get('http://localhost:5050/solutionVotes/pair?user=' + 
+      localStorage.getItem('user_id') +
+      '&solution=' + this.state.idSolution
+    )
+      .then( (response) => {
+        if (response.data === true) {
+          this.setState({
+            upvoteColor: "blue",
+            upvoteExists: true
+          });
+        } else if (response.data === false) {
+          this.setState({
+            downvoteColor: "red",
+            upvoteExists: true
+          });
+        } 
+      })
+      .catch( (error) => {
+        console.log(error);
+      });
   }
 
   handleUpvote() {
-    this.setState({
-      upvoteColor: "blue",
-      downvoteColor: "grey"
-    });
+    if (this.state.upvoteColor !== 'blue') {
+      axios.post('http://localhost:5050/solutionVotes/new?user=' +
+        localStorage.getItem('user_id') +
+        '&solution=' + this.state.idSolution +
+        '&vote=' + true +
+        '&exists=' + this.state.upvoteExists
+      )
+        .then( (response) => {
+          let upvotes = this.state.upvoteExists ? this.state.upvotes + 2 : this.state.upvotes + 1;
+          this.setState({
+            upvoteColor: "blue",
+            downvoteColor: "grey",
+            upvotes: upvotes
+          });
+        })
+        .catch( (error) => {
+          console.log(error);
+        }); 
+    }
   }
 
   handleDownvote() {
-    this.setState({
-      downvoteColor: "red",
-      upvoteColor: "grey"
-    });
+    if (this.state.downvoteColor !== 'red') {
+      axios.post('http://localhost:5050/solutionVotes/new?user=' +
+        localStorage.getItem('user_id') +
+        '&solution=' + this.state.idSolution +
+        '&vote=' + false +
+        '&exists=' + this.state.upvoteExists
+      )
+        .then( (response) => {
+          let upvotes = this.state.upvoteExists ? this.state.upvotes - 2 : this.state.upvotes - 1;
+          this.setState({
+            downvoteColor: "red",
+            upvoteColor: "grey",
+            upvotes: upvotes
+          });
+        })
+        .catch( (error) => {
+          console.log(error);
+        }); 
+    }
   }
 
   render() {
@@ -74,6 +128,9 @@ class Solutions extends Component {
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     let openDate = this.state.openDate ? new Date(this.state.openDate).toLocaleDateString('en-US', options) : '';
     let deadline = this.state.deadline ? new Date(this.state.deadline).toLocaleDateString('en-US', options) : '';
+    if (this.state.loading) {
+      return <center><Spinner name="ball-scale-ripple" style={{ marginTop: "25%" }}/></center>;
+    } 
     return (
       <Container>
         <Grid centered>

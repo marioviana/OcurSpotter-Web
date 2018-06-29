@@ -3,7 +3,7 @@ import { Container, Header, Modal, Button, Grid, Card } from 'semantic-ui-react'
 import { Link, withRouter } from "react-router-dom";
 import axios from 'axios';
 
-class Occurrence extends Component {
+class MyOccurrences extends Component {
 
   constructor(props) {
     super(props);
@@ -21,8 +21,13 @@ class Occurrence extends Component {
             <Card key={i} style={{ width: "100%" }}>
               <Card.Content>
                 <Card.Header>{response.data[i].title}</Card.Header>
-                <Card.Meta><Link to={{ pathname: "/solutions/", state: {} }}>See more</Link></Card.Meta>
+                <Card.Meta><Link to={"/occurrences/" + response.data[i].id}>See more</Link></Card.Meta>
                 <Card.Description>{response.data[i].description}</Card.Description>
+                <Card.Content extra style={{ marginTop: "2%" }}>
+                    <Button basic color='red' style={{ width: "100%" }}>
+                      Close
+                    </Button>
+                </Card.Content>
               </Card.Content>
             </Card>
           );
@@ -52,4 +57,4 @@ class Occurrence extends Component {
   }
 };
 
-export default Occurrence;
+export default MyOccurrences;

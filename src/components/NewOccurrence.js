@@ -80,6 +80,7 @@ class NewOccurrence extends Component {
       + "&image=" + this.state.uploadedFileCloudinaryUrl, {
       })
         .then(function (response) {
+          this.props.history.push('/map');
           console.log(response);
         })
         .catch(function (error) {

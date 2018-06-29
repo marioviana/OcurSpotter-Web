@@ -16,7 +16,7 @@ import Login from './Login';
 import NewOccurrence from './NewOccurrence';
 import Solutions from './Solutions';
 import NewSolution from './NewSolution';
-import Occurrence from './Occurrence';
+import MyOccurrences from './MyOccurrences';
 
 const Root = (props) => {
   return (
@@ -31,7 +31,7 @@ const Root = (props) => {
           <Route path="/solution/:id" component={NewSolution} />
           <Route path="/occurrences/:id" component={Occurrences} />
           <Route path="/solutions/:idS" component={Solutions} />
-          <Route path="/my/occurrences" component={Occurrence} />
+          <Route path="/my/occurrences" component={MyOccurrences} />
           <Route path="/solutions/my" component={Home} />
           <Route path="*" component={Home} />
         </Switch>

@@ -9,13 +9,13 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = { 
-      usernameSI: null, 
-      passwordSI: null,
-      usernameSU: null,
-      mailSU: null,
-      fistNameSU: null,
-      lastNameSU: null,
-      passwordSU: null 
+      usernameSI: '', 
+      passwordSI: '',
+      usernameSU: '',
+      mailSU: '',
+      fistNameSU: '',
+      lastNameSU: '',
+      passwordSU: '' 
     };
   }
 
@@ -61,19 +61,19 @@ class Login extends Component {
                         { menuItem: 'Sign In', 
                           render: () => 
                           <Form>
-                            <Form.Input label='Username' onChange={ (e) => this.setState({ usernameSI: e.target.value }) }/>
-                            <Form.Input label='Password' type='password' onChange={ (e) => this.setState({ passwordSI: e.target.value }) }/>
+                            <Form.Input label='Username' value={ this.state.usernameSI } onChange={ (e) => this.setState({ usernameSI: e.target.value }) }/>
+                            <Form.Input label='Password' value={ this.state.passwordSI } type='password' onChange={ (e) => this.setState({ passwordSI: e.target.value }) }/>
                             <Button onClick={ this.handleSubmitLogin.bind(this) }>Submit</Button>
                           </Form>
                         },
                         { menuItem: 'Sign Up',
                           render: () => 
                           <Form>
-                            <Form.Input label='Username' onChange={ (e) => this.setState({ usernameSU: e.target.value }) }/>
-                            <Form.Input label='Email' onChange={ (e) => this.setState({ mailSU: e.target.value }) }/>
-                            <Form.Input label='First Name' onChange={ (e) => this.setState({ firstNameSU: e.target.value }) }/>
-                            <Form.Input label='Last Name' onChange={ (e) => this.setState({ lastNameSU: e.target.value }) }/>
-                            <Form.Input label='Password' type='password' onChange={ (e) => this.setState({ passwordSU: e.target.value }) }/>
+                            <Form.Input label='Username' value={ this.state.usernameSU } onChange={ (e) => this.setState({ usernameSU: e.target.value }) }/>
+                            <Form.Input label='Email' value={ this.state.mailSU } onChange={ (e) => this.setState({ mailSU: e.target.value }) }/>
+                            <Form.Input label='First Name' value={ this.state.fistNameSU } onChange={ (e) => this.setState({ firstNameSU: e.target.value }) }/>
+                            <Form.Input label='Last Name' value={ this.state.lastNameSU } onChange={ (e) => this.setState({ lastNameSU: e.target.value }) }/>
+                            <Form.Input label='Password' value={ this.state.passwordSU } type='password' onChange={ (e) => this.setState({ passwordSU: e.target.value }) }/>
                             <Button onClick={ this.handleSubmitSignup.bind(this) }>Submit</Button>
                           </Form> 
                         },
