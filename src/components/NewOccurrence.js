@@ -62,8 +62,11 @@ class NewOccurrence extends Component {
   }
 
   handleSubmit() {
-    let formValidated = false;
-    if (this.state.title && this.state.description && this.state.type) {
+    let formValidated = false, 
+      title = this.state.title, 
+      description = this.state.description;
+    if (title && title.length > 4 && title.length < 50 && description && 
+        description.length > 4 && this.state.type && this.state.uploadedFile) {
       formValidated = true;
     }
     this.setState({
@@ -101,7 +104,7 @@ class NewOccurrence extends Component {
     let options = [];
     if (this.state.types) {
       this.state.types.map( type =>
-        options.push({ text: type.name , value: type.id })
+        options.push({ text: type.name , value: type.id, image: { avatar: true, src: type.avatar} })
       );
     }
 
@@ -119,7 +122,7 @@ class NewOccurrence extends Component {
               <div className="field" style={{ marginBottom: "-2%" }}>
                 <label >Pick the place</label>
                 <input placeholder="Address" type="text" className="gllpSearchField" style={{ width: "85.8%", marginRight: "1%" }}/>
-                <Button type="button" className="gllpSearchButton" value="search">Search</Button>
+                <Button secondary type="button" className="gllpSearchButton" value="search">Search</Button>
               </div>
               <br/>
               <div className="gllpMap" style={{ width: "100%" }}>Maps</div>
@@ -149,7 +152,7 @@ class NewOccurrence extends Component {
                   <center><Image src={this.state.uploadedFileCloudinaryUrl} rounded style={{ maxHeight: "250px" }}/></center>
                 </div>}
               </div>
-              <Button fluid style={{ marginTop: "5%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
+              <Button primary fluid style={{ marginTop: "5%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
             </fieldset>
           </Form>
           <form>

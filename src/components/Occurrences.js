@@ -38,8 +38,7 @@ class Occurrences extends Component {
           status: response.data.status,
           closeDate: response.data.closeDate,      
           image: response.data.image,
-          creatorName: response.data.user.firstName + " " + response.data.user.lastName,
-          creatorAvatar: response.data.user.avatar,
+          creator: response.data.user,
           solution: response.data.solution
         });
       })
@@ -53,12 +52,12 @@ class Occurrences extends Component {
       .then( (response) => {
         if (response.data === true) {
           this.setState({
-            upvoteColor: "blue",
+            upvoteColor: "#2185d0",
             upvoteExists: true
           });
         } else if (response.data === false) {
           this.setState({
-            downvoteColor: "red",
+            downvoteColor: "#db2828",
             upvoteExists: true
           });
         } 
@@ -79,7 +78,7 @@ class Occurrences extends Component {
         .then( (response) => {
           let upvotes = this.state.upvoteExists ? this.state.upvotes + 2 : this.state.upvotes + 1;
           this.setState({
-            upvoteColor: "blue",
+            upvoteColor: "#2185d0",
             downvoteColor: "grey",
             upvotes: upvotes
           });
@@ -101,7 +100,7 @@ class Occurrences extends Component {
         .then( (response) => {
           let upvotes = this.state.upvoteExists ? this.state.upvotes - 2 : this.state.upvotes - 1;
           this.setState({
-            downvoteColor: "red",
+            downvoteColor: "#db2828",
             upvoteColor: "grey",
             upvotes: upvotes
           });
@@ -114,6 +113,9 @@ class Occurrences extends Component {
 
   render() {
     localStorage.setItem('reload', 'NULL');
+    if (this.state.loading) {
+      return <center><Spinner name="ball-scale-ripple" style={{ marginTop: "25%" }}/></center>;
+    } 
     let solutions = [];
     let path = "/solutions/" + this.state.id;
     if (this.state.solution) {
@@ -121,8 +123,18 @@ class Occurrences extends Component {
         solutions.push(
           <Card key={i} style={{ width: "100%" }}>
             <Card.Content>
-              <Card.Header>{this.state.solution[i].user.firstName + " " + this.state.solution[i].user.lastName}</Card.Header>
-              <Card.Meta><Link to={{ pathname: "/solutions/" + this.state.solution[i].id, state: { occId: this.state.id, occTitle: this.state.title,  occImage: this.state.image} }}>See more</Link></Card.Meta>
+              <Card.Header>
+                <Image style={{ fontSize: '12px' }}src={this.state.solution[i].user.avatar} avatar />
+                {this.state.solution[i].user.firstName + " " + this.state.solution[i].user.lastName}
+                <small style={{ float: 'right', color: 'grey' }}>Value: {this.state.solution[i].value}$</small>
+              </Card.Header>
+              <Card.Meta>
+                <Link 
+                  to={{ pathname: "/solutions/" + this.state.solution[i].id, 
+                    state: { occId: this.state.id, occTitle: this.state.title,  occImage: this.state.image} }}>
+                    See more
+                </Link>
+              </Card.Meta>
               <Card.Description>{this.state.solution[i].description}</Card.Description>
             </Card.Content>
           </Card>
@@ -170,9 +182,7 @@ class Occurrences extends Component {
     }
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     let openDate = this.state.openDate ? new Date(this.state.openDate).toLocaleDateString('en-US', options) : '';
-    if (this.state.loading) {
-      return <center><Spinner name="ball-scale-ripple" style={{ marginTop: "25%" }}/></center>;
-    } 
+    let name = this.state.creator ? this.state.creator.firstName + " " + this.state.creator.lastName : '';
     return (
       <Container>
         <Grid centered>
@@ -180,17 +190,23 @@ class Occurrences extends Component {
         </Grid>
         <Grid centered><Grid.Row><Grid.Column width={10}>
           <Image src={this.state.image} rounded /><p></p>
+          <Header as='h3'>Details</Header>
           <p><strong>Type: </strong><Label color={color} horizontal>{this.state.type}</Label></p>
           <p><strong>Description: </strong>{this.state.description}</p>
           <p><strong>Open date: </strong>{openDate}</p>          
-          <p><strong>Creator: </strong>{this.state.creatorName}</p>
+          <p><strong>Creator: </strong>
+            <Label as='a' image style={{ backgroundColor: 'white' }}>
+              <img src={this.state.creator.avatar} />
+              {name}
+            </Label>
+          </p>
           <p><strong>Votes: </strong>
             <Icon onClick={this.handleUpvote} style={{ color: this.state.upvoteColor, marginRight: "0.8%" }} name='arrow up' />
             {this.state.upvotes - this.state.downvotes}  
             <Icon onClick={this.handleDownvote} style={{ color: this.state.downvoteColor, marginLeft: "1%" }} name='arrow down' /></p>
-          <p><strong>Solutions: </strong></p>
+            <Header as='h3'>Solutions</Header>
           {solutions}
-          <Button fluid><Link to={"/solution/" + this.state.id} style={{ color: "black" }}>Add solution</Link></Button>
+          <Button primary fluid><Link to={"/solution/" + this.state.id} style={{ color: "white" }}>Add solution</Link></Button>
         </Grid.Column></Grid.Row></Grid>
       </Container>
     );

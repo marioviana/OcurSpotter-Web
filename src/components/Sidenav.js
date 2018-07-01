@@ -21,15 +21,16 @@ class Sidenav extends Component {
     const activeItem = this.state.activeItem;
     const login = [];
     if (localStorage.getItem('user_id') === "NULL") {
-      login.push(<Link key='sigin' to="/login"><Menu.Item key="signin" name='login' active={activeItem === 'login'} onClick={this.handleItemClick.bind(this)}>Sign In</Menu.Item></Link>);
+      login.push(<Link key='signin' to="/login"><Menu.Item key="signin" name='login' active={activeItem === 'login'} onClick={this.handleItemClick.bind(this)}>Sign In</Menu.Item></Link>);
     } else {
       login.push(<Link key="my" to="/my/occurrences"><Menu.Item key="my" name='my' active={activeItem === 'my'}>My Occurrences</Menu.Item></Link>);
+      login.push(<Link key="stats" to="/stats"><Menu.Item key="stats" name='stats' active={activeItem === 'stats'}>Stats</Menu.Item></Link>);
       login.push(<Link key="profile" to="/profile"><Menu.Item key="profile" name='profile' active={activeItem === 'profile'}>Profile</Menu.Item></Link>);
-      login.push(<Menu.Item key="signout" name='logout' onClick={this.handleLogout.bind(this)}>Sign Out</Menu.Item>);  
+      login.push(<Link key="logout" to="/login"><Menu.Item key="logout" name='logout' active={activeItem === 'logout'} onClick={this.handleLogout.bind(this)}>Sign Out</Menu.Item></Link>);  
     }
     return (
       <div className="sidenav">
-        <Menu secondary pointing>
+        <Menu pointing>
           <Link to="/">
             <Menu.Item header name='home' active={activeItem === 'home'} onClick={this.handleItemClick.bind(this)}>OcurSpotter</Menu.Item>
           </Link>      

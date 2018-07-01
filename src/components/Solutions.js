@@ -35,8 +35,7 @@ class Solutions extends Component {
           upvotes: response.data.upvotes,
           description: response.data.description,
           status: response.data.status,
-          creatorName: response.data.user.firstName + " " + response.data.user.lastName,
-          creatorAvatar: response.data.user.avatar,
+          creator: response.data.user,
           value: response.data.value
         });
       })
@@ -50,12 +49,12 @@ class Solutions extends Component {
       .then( (response) => {
         if (response.data === true) {
           this.setState({
-            upvoteColor: "blue",
+            upvoteColor: "#2185d0",
             upvoteExists: true
           });
         } else if (response.data === false) {
           this.setState({
-            downvoteColor: "red",
+            downvoteColor: "#db2828",
             upvoteExists: true
           });
         } 
@@ -76,7 +75,7 @@ class Solutions extends Component {
         .then( (response) => {
           let upvotes = this.state.upvoteExists ? this.state.upvotes + 2 : this.state.upvotes + 1;
           this.setState({
-            upvoteColor: "blue",
+            upvoteColor: "#2185d0",
             downvoteColor: "grey",
             upvotes: upvotes
           });
@@ -98,7 +97,7 @@ class Solutions extends Component {
         .then( (response) => {
           let upvotes = this.state.upvoteExists ? this.state.upvotes - 2 : this.state.upvotes - 1;
           this.setState({
-            downvoteColor: "red",
+            downvoteColor: "#db2828",
             upvoteColor: "grey",
             upvotes: upvotes
           });
@@ -111,6 +110,9 @@ class Solutions extends Component {
 
   render() {
     localStorage.setItem('reload', 'NULL');
+    if (this.state.loading) {
+      return <center><Spinner name="ball-scale-ripple" style={{ marginTop: "25%" }}/></center>;
+    }
     let solutions = [];
     if (this.state.solution) {
       for (let i = 0; i < this.state.solution.length; i++) {
@@ -125,12 +127,10 @@ class Solutions extends Component {
         );
       }
     }
-    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    let openDate = this.state.openDate ? new Date(this.state.openDate).toLocaleDateString('en-US', options) : '';
-    let deadline = this.state.deadline ? new Date(this.state.deadline).toLocaleDateString('en-US', options) : '';
-    if (this.state.loading) {
-      return <center><Spinner name="ball-scale-ripple" style={{ marginTop: "25%" }}/></center>;
-    } 
+    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
+      openDate = this.state.openDate ? new Date(this.state.openDate).toLocaleDateString('en-US', options) : '',
+      deadline = this.state.deadline ? new Date(this.state.deadline).toLocaleDateString('en-US', options) : '',
+      creatorName = this.state.creator.firstName + " " + this.state.creator.lastName;
     return (
       <Container>
         <Grid centered>
@@ -144,12 +144,17 @@ class Solutions extends Component {
           <p><strong>Open date: </strong>{openDate}</p>
           <p><strong>Deadline: </strong>{deadline}</p>
           <p><strong>Value: </strong>{this.state.value} $</p>          
-          <p><strong>Creator: </strong>{this.state.creatorName}</p>
+          <p><strong>Creator: </strong>
+            <Label as='a' image style={{ backgroundColor: 'white' }}>
+              <img src={this.state.creator.avatar} />
+              {creatorName}
+            </Label>
+          </p>
           <p><strong>Votes: </strong>
             <Icon onClick={this.handleUpvote} style={{ color: this.state.upvoteColor, marginRight: "0.8%" }} name='arrow up' />
             {this.state.upvotes - this.state.downvotes}  
             <Icon onClick={this.handleDownvote} style={{ color: this.state.downvoteColor, marginLeft: "1%" }} name='arrow down' /></p>
-            <Button fluid><Link to={"/occurrences/" + this.state.idOccurrence} style={{ color: "black" }}>Back to occurrence</Link></Button>
+            <Button secondary fluid><Link to={"/occurrences/" + this.state.idOccurrence} style={{ color: "white" }}>Back to occurrence</Link></Button>
         </Grid.Column></Grid.Row></Grid>
       </Container>
     );

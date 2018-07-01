@@ -20,14 +20,15 @@ class MyOccurrences extends Component {
           occurrences.push(
             <Card key={i} style={{ width: "100%" }}>
               <Card.Content>
-                <Card.Header>{response.data[i].title}</Card.Header>
+                <Card.Header>
+                  {response.data[i].title}
+                  <Button floated='right' color='red'>
+                    Close
+                  </Button></Card.Header>
                 <Card.Meta><Link to={"/occurrences/" + response.data[i].id}>See more</Link></Card.Meta>
-                <Card.Description>{response.data[i].description}</Card.Description>
-                <Card.Content extra style={{ marginTop: "2%" }}>
-                    <Button basic color='red' style={{ width: "100%" }}>
-                      Close
-                    </Button>
-                </Card.Content>
+                <Card.Description>
+                  {response.data[i].description}
+                </Card.Description>
               </Card.Content>
             </Card>
           );

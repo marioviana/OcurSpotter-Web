@@ -56,30 +56,34 @@ class Login extends Component {
         <Grid centered>
           <Header as='h1'>Welcome back!</Header>
         </Grid>
-        <Grid className="centered"><Grid.Row><Grid.Column width={8}>
-        <Tab menu={{ secondary: true, pointing: true }} panes={[
-                        { menuItem: 'Sign In', 
-                          render: () => 
-                          <Form>
-                            <Form.Input label='Username' value={ this.state.usernameSI } onChange={ (e) => this.setState({ usernameSI: e.target.value }) }/>
-                            <Form.Input label='Password' value={ this.state.passwordSI } type='password' onChange={ (e) => this.setState({ passwordSI: e.target.value }) }/>
-                            <Button onClick={ this.handleSubmitLogin.bind(this) }>Submit</Button>
-                          </Form>
-                        },
-                        { menuItem: 'Sign Up',
-                          render: () => 
-                          <Form>
-                            <Form.Input label='Username' value={ this.state.usernameSU } onChange={ (e) => this.setState({ usernameSU: e.target.value }) }/>
-                            <Form.Input label='Email' value={ this.state.mailSU } onChange={ (e) => this.setState({ mailSU: e.target.value }) }/>
-                            <Form.Input label='First Name' value={ this.state.fistNameSU } onChange={ (e) => this.setState({ firstNameSU: e.target.value }) }/>
-                            <Form.Input label='Last Name' value={ this.state.lastNameSU } onChange={ (e) => this.setState({ lastNameSU: e.target.value }) }/>
-                            <Form.Input label='Password' value={ this.state.passwordSU } type='password' onChange={ (e) => this.setState({ passwordSU: e.target.value }) }/>
-                            <Button onClick={ this.handleSubmitSignup.bind(this) }>Submit</Button>
-                          </Form> 
-                        },
-                      ]}>
-        </Tab>
-        </Grid.Column></Grid.Row></Grid>
+        <Grid className="centered">
+          <Grid.Row>
+            <Grid.Column width={8}>
+              <Tab 
+                menu={{ secondary: true, pointing: true }} 
+                panes={[{ menuItem: 'Sign In', 
+                render: () => 
+                  <Form>
+                    <Form.Input label='Username' value={ this.state.usernameSI } onChange={ (e) => this.setState({ usernameSI: e.target.value }) }/>
+                    <Form.Input label='Password' value={ this.state.passwordSI } type='password' onChange={ (e) => this.setState({ passwordSI: e.target.value }) }/>
+                    <Button primary onClick={ this.handleSubmitLogin.bind(this) }>Submit</Button>
+                  </Form>
+                },
+                { menuItem: 'Sign Up',
+                  render: () => 
+                    <Form>
+                      <Form.Input label='Username' value={ this.state.usernameSU } onChange={ (e) => this.setState({ usernameSU: e.target.value }) }/>
+                      <Form.Input label='Email' value={ this.state.mailSU } onChange={ (e) => this.setState({ mailSU: e.target.value }) }/>
+                      <Form.Input label='First Name' value={ this.state.fistNameSU } onChange={ (e) => this.setState({ firstNameSU: e.target.value }) }/>
+                      <Form.Input label='Last Name' value={ this.state.lastNameSU } onChange={ (e) => this.setState({ lastNameSU: e.target.value }) }/>
+                      <Form.Input label='Password' value={ this.state.passwordSU } type='password' onChange={ (e) => this.setState({ passwordSU: e.target.value }) }/>
+                      <Button primary onClick={ this.handleSubmitSignup.bind(this) }>Submit</Button>
+                    </Form> 
+                },]} 
+              />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Container>
     )
   }

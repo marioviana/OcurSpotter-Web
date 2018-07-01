@@ -62,9 +62,9 @@ class NewSolution extends Component {
             <Form.Input required label='Whats the value of this solution?' placeholder='Value' type='number' onChange={ (e) => this.setState({ value: e.target.value }) }/>
             <p><strong>When is the deadline of this solution?</strong></p>
             <DayPickerInput onDayChange={ (e) => this.setState({ deadline: e }) }/>
-            <Button fluid style={{ marginTop: "3%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
+            <Button primary fluid style={{ marginTop: "3%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
           </Form>
-          <Button fluid style={{ marginTop: "3%" }}><Link to={"/occurrences/" + this.state.id} style={{ color: "black" }}>Go Back</Link></Button>
+          <Button secondary fluid style={{ marginTop: "1%" }}><Link to={"/occurrences/" + this.state.id} style={{ color: "white" }}>Go Back</Link></Button>
         </Grid.Column></Grid.Row></Grid>
       </Container>
     )
