@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
-import Dropzone from 'react-dropzone'
-import axios from 'axios'
+import React, { Component } from 'react';
+import Dropzone from 'react-dropzone';
+import axios from 'axios';
 
 
 class FileUpload extends Component {
 
   state = {
-      uploadedFileCloudinaryUrl:'',
-      originalFileNameCloudinaryUrl:'',
-      originalFileHeightCloudinaryUrl: 0,
-      originalFileWidthCloudinaryUrl: 0,
-      originalFileFormatCloudinaryUrl: '',
-      createAtCloudinaryUrl: ''
+    uploadedFileCloudinaryUrl:'',
+    originalFileNameCloudinaryUrl:'',
+    originalFileHeightCloudinaryUrl: 0,
+    originalFileWidthCloudinaryUrl: 0,
+    originalFileFormatCloudinaryUrl: '',
+    createAtCloudinaryUrl: ''
   }
 
   handleDrop = files => {
@@ -51,7 +51,7 @@ class FileUpload extends Component {
         this.setState({createAtCloudinaryUrl:createAt});
         // console.log("setState... "+this.state.createAtCloudinaryUrl);
         
-      })
+      });
     });
   
     // Once all the files are uploaded 
@@ -62,26 +62,34 @@ class FileUpload extends Component {
   }
 
   render() {
-    return (<div style={{marginTop:"50px"}}>
+    return (
+      <div style={{ marginTop:"50px" }}>
         <Dropzone
-          width="10px" 
+          accept="image/*"
           onDrop={this.handleDrop} 
-          multiple 
-          accept="image/*" >
-        <p style={{color: "grey", textAlign:"center", marginTop:"80px"}}>Drop your files or click here to upload</p>
-      </Dropzone>
-      <div>
-        {this.state.uploadedFileCloudinaryUrl === '' ? null :
+          multiple
+          width="10px" 
+        >
+          <p style={{ color: "grey", textAlign:"center", marginTop:"80px" }}>
+            Drop your files or click here to upload
+          </p>
+        </Dropzone>
+        <div>
+          { this.state.uploadedFileCloudinaryUrl === '' ? null :
             <div>
-                <p>{this.state.originalFileNameCloudinaryUrl}</p>
-                <img alt={this.state.originalFileNameCloudinaryUrl} style={{width:"100px", height:"100px"}} src={this.state.uploadedFileCloudinaryUrl} />
+              <p>{this.state.originalFileNameCloudinaryUrl}</p>
+              <img 
+                alt={this.state.originalFileNameCloudinaryUrl} 
+                src={this.state.uploadedFileCloudinaryUrl}
+                style={{ width:"100px", height:"100px" }} 
+              />
             </div>
-         }
-       </div>
+          }
+        </div>
       </div>
-    )
+    );
   }
   
 }  
 
-export default FileUpload
+export default FileUpload;

@@ -1,19 +1,25 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-
 import Sidenav from './Sidenav';
 import { Container } from 'semantic-ui-react';
 
-const App = ({ children }) => {
-  return (
-    <div>
-      <Sidenav />
-      <Container style={{ marginTop: "5%" }}>
-        {children}
-      </Container>
-    </div>
-  );
-};
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div>
+        <Sidenav changeLang={this.props.changeLang} locale={this.props.locale}/>
+        <Container style={{ marginTop: "5%" }}>
+          {this.props.children}
+        </Container>
+      </div>
+    );
+  };
+}
 
 App.propTypes = {
   children: PropTypes.node,

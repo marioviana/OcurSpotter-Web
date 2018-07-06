@@ -4,6 +4,23 @@ import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 import axios from 'axios';
 import { Link, withRouter } from "react-router-dom";
+import { stringify } from "qs";
+
+import {addLocaleData} from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import fr from 'react-intl/locale-data/fr';
+import es from 'react-intl/locale-data/es';
+import pt from 'react-intl/locale-data/pt';
+import de from 'react-intl/locale-data/de';
+
+addLocaleData([...en, ...fr, ...es, ...pt, ...de]);
+
+import {
+    injectIntl,
+    IntlProvider,
+    FormattedRelative,
+    FormattedMessage
+} from 'react-intl';
 
 class NewSolution extends Component {
 
@@ -15,38 +32,36 @@ class NewSolution extends Component {
       deadline: null,
       value: 0
     };
-  }
-
-  componentWillMount() {
-    
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit() {
-    let deadline = this.state.deadline.getTime();
+    let deadline = this.state.deadline ? this.state.deadline.getTime() : null;
     let formValidated = false;
-    if (this.state.description && parseInt(this.state.value) && this.state.deadline) {
+    if (this.state.description && parseInt(this.state.value, 10) && this.state.deadline) {
       formValidated = true;
     }
     if (formValidated) {
-      console.log(deadline);
-      axios.post('http://localhost:5050/solutions/new?' 
-      + "description=" + this.state.description 
-      + "&author=" + localStorage.getItem('user_id')
-      + "&value=" + this.state.value
-      + "&deadline=" + deadline
-      + "&occurrence=" + this.state.id, {
-      })
+      axios.post('http://localhost:5050/solutions/new', 
+        stringify({
+          description: this.state.description,
+          author: localStorage.getItem('user_id'),
+          value: this.state.value,
+          deadline: deadline,
+          occurrence: this.state.id
+        })
+      )
         .then(function (response) {
+          this.props.history.push(`/occurrences/${this.state.id}`);
           console.log(response);
         })
         .catch(function (error) {
           console.log(error);
-        })
+        });
     }
   }
 
   render () {
-    localStorage.setItem('reload', 'NULL');
     if (localStorage.getItem('user_id') === "NULL") {
       this.props.history.push("/login");
     }
@@ -54,18 +69,51 @@ class NewSolution extends Component {
     return (
       <Container>
         <Grid centered>
-          <Header as='h1'>Regist a new solution</Header>
+          <Header as='h1'><FormattedMessage id='regist.solution' /></Header>
         </Grid>
-        <Grid className="centered"><Grid.Row><Grid.Column width={10}>
-          <Form>      
-            <Form.TextArea required label='Describe the solution' placeholder='Description' onChange={ (e) => this.setState({ description: e.target.value }) }/>
-            <Form.Input required label='Whats the value of this solution?' placeholder='Value' type='number' onChange={ (e) => this.setState({ value: e.target.value }) }/>
-            <p><strong>When is the deadline of this solution?</strong></p>
-            <DayPickerInput onDayChange={ (e) => this.setState({ deadline: e }) }/>
-            <Button primary fluid style={{ marginTop: "3%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
-          </Form>
-          <Button secondary fluid style={{ marginTop: "1%" }}><Link to={"/occurrences/" + this.state.id} style={{ color: "white" }}>Go Back</Link></Button>
-        </Grid.Column></Grid.Row></Grid>
+        <Grid className="centered">
+          <Grid.Row>
+            <Grid.Column width={10}>
+              <Form>      
+                <Form.TextArea 
+                  label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='description.solution' />:</strong>}
+                  onChange={(e) => this.setState({ description: e.target.value })} 
+                  placeholder='Description' 
+                />
+                <Form.Input 
+                  label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='value.solution' /></strong>}
+                  onChange={(e) => this.setState({ value: e.target.value })} 
+                  placeholder='Value' 
+                  type='number'
+                />
+                <p>
+                  <strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "-8px" }}><FormattedMessage id='deadline.solution' /></strong>
+                </p>
+                <DayPickerInput onDayChange={(e) => this.setState({ deadline: e })} />
+                <Button 
+                  fluid 
+                  onClick={this.handleSubmit} 
+                  primary 
+                  style={{ marginTop: "3%" }}
+                >
+                  Submit
+                </Button>
+              </Form>
+              <Button 
+                fluid 
+                secondary 
+                style={{ marginTop: "1%" }}
+              >
+                <Link 
+                  style={{ color: "white" }} 
+                  to={`/occurrences/${this.state.id}`}
+                >
+                  Go Back
+                </Link>
+              </Button>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Container>
     )
   }

@@ -4,6 +4,25 @@ import axios from 'axios';
 import Dropzone from 'react-dropzone';
 import request from 'superagent';
 import { withRouter } from "react-router-dom";
+import { stringify } from "qs";
+import Geocode from "react-geocode";
+import { Map, TileLayer, Marker } from 'react-leaflet';
+
+import {addLocaleData} from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import fr from 'react-intl/locale-data/fr';
+import es from 'react-intl/locale-data/es';
+import pt from 'react-intl/locale-data/pt';
+import de from 'react-intl/locale-data/de';
+
+addLocaleData([...en, ...fr, ...es, ...pt, ...de]);
+
+import {
+    injectIntl,
+    IntlProvider,
+    FormattedRelative,
+    FormattedMessage
+} from 'react-intl';
 
 const CLOUDINARY_UPLOAD_PRESET = 'ocurspotter';
 const CLOUDINARY_UPLOAD_URL = 'https://api.cloudinary.com/v1_1/marioviana/upload';
@@ -15,12 +34,24 @@ class NewOccurrence extends Component {
     this.state = { 
       title: null,
       description: null,
-      lat: 0,
-      lon: 0,
       uploadedFile: null,
       uploadedFileCloudinaryUrl: '',
-      types: null
+      types: null,
+      center: {
+        lat: 20,
+        lng: 20,
+      },
+      marker: {
+        lat: 20,
+        lng: 20,
+      },
+      zoom: 6,
+      draggable: true,
+      address: '',
+      search: ''
     };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onImageDrop = this.onImageDrop.bind(this);
   }
 
   componentWillMount() {
@@ -44,7 +75,8 @@ class NewOccurrence extends Component {
   }
 
   handleImageUpload(file) {
-    let upload = request.post(CLOUDINARY_UPLOAD_URL)
+    let upload = request
+      .post(CLOUDINARY_UPLOAD_URL)
       .field('upload_preset', CLOUDINARY_UPLOAD_PRESET)
       .field('file', file);
 
@@ -69,19 +101,18 @@ class NewOccurrence extends Component {
         description.length > 4 && this.state.type && this.state.uploadedFile) {
       formValidated = true;
     }
-    this.setState({
-      lat: document.getElementById("latitude").value,
-      long: document.getElementById("longitude").value 
-    });
     if (formValidated) {
-      axios.post('http://localhost:5050/occurrences/new?title=' + this.state.title 
-      + "&description=" + this.state.description 
-      + "&type=" + this.state.type 
-      + "&lat=" + document.getElementById("latitude").value
-      + "&lon=" + document.getElementById("longitude").value 
-      + "&author=" + localStorage.getItem('user_id')
-      + "&image=" + this.state.uploadedFileCloudinaryUrl, {
-      })
+      axios.post('http://localhost:5050/occurrences/new', 
+        stringify({
+          title: this.state.title,
+          description: this.state.description,
+          type: this.state.type, 
+          lat: this.state.marker.lat,
+          lon: this.state.marker.lng,
+          author: localStorage.getItem('user_id'),
+          image: this.state.uploadedFileCloudinaryUrl
+        })
+      )
         .then(function (response) {
           this.props.history.push('/map');
           console.log(response);
@@ -92,72 +123,143 @@ class NewOccurrence extends Component {
     }
   }
 
+  updatePosition(e) {
+    let lat = e.target._latlng.lat,
+      lng = e.target._latlng.lng;
+    Geocode.setApiKey("AIzaSyAgzcXinSLPPfMZTov2URj_f-Jk99tz8lw");
+    Geocode.fromLatLng(lat, lng).then(
+      response => {
+        let address = response.results[0].formatted_address;
+        this.setState({
+          address: address
+        });
+      },
+      error => {
+        this.setState({
+          address: '',
+        });
+        console.error(error);
+      }
+    );
+    this.setState({
+      marker: { lat, lng }
+    });
+  }
+
+  handleAddress() {
+    Geocode.setApiKey("AIzaSyAgzcXinSLPPfMZTov2URj_f-Jk99tz8lw");
+    Geocode.fromAddress(this.state.search).then(
+      response => {
+        const { lat, lng } = response.results[0].geometry.location;
+        this.setState({
+          marker: { lat, lng }
+        });
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }
+
   render () {
-    if (localStorage.getItem('reload') === 'NULL') {
-      window.location.reload();
-      localStorage.setItem('reload', 1);
-    }
     if (localStorage.getItem('user_id') === 'NULL') {
       this.props.history.push('/login');
     }
-
+    const markerPosition = [this.state.marker.lat, this.state.marker.lng];
     let options = [];
     if (this.state.types) {
       this.state.types.map( type =>
-        options.push({ text: type.name , value: type.id, image: { avatar: true, src: type.avatar} })
+        options.push({ text: type.name , value: type.id, image: { avatar: true, src: type.avatar } })
       );
     }
 
     return (
       <Container>
         <Grid centered>
-          <Header as='h1'>Regist a new occurrence</Header>
+          <Header as='h1'><FormattedMessage id='regist.occurrence' /></Header>
         </Grid>
-        <Grid className="centered"><Grid.Row><Grid.Column width={10}>
-          <Form>
-            <fieldset className="gllpLatlonPicker" style={{ "border" : 0 }}>
-              <Form.Input label='Name the occurrence' placeholder='Title' onChange={ (e) => this.setState({ title: e.target.value }) }/>
-              <Form.TextArea label='Describe the occurrence' placeholder='Description' onChange={ (e) => this.setState({ description: e.target.value }) }/>
-              <Form.Select label="What's the type of the occurrence?" fluid options={options} placeholder='Occurrence type' onChange={(e, { value }) => this.setState({ type: value }) }/>
-              <div className="field" style={{ marginBottom: "-2%" }}>
-                <label >Pick the place</label>
-                <input placeholder="Address" type="text" className="gllpSearchField" style={{ width: "85.8%", marginRight: "1%" }}/>
-                <Button secondary type="button" className="gllpSearchButton" value="search">Search</Button>
-              </div>
-              <br/>
-              <div className="gllpMap" style={{ width: "100%" }}>Maps</div>
-              {/*lat:*/}
-              <input hidden type="text" id="latitude" className="gllpLatitude" style={{ width: "30%" }}/> 
-              {/*lon: */}
-              <input hidden type="text" id="longitude" className="gllpLongitude" style={{ width: "30%"}}/>
-              {/*zoom: */}
-              <input hidden type="text" className="gllpZoom" value="3" style={{ width: "30%"}}/> 
-              <input hidden type="button" className="gllpUpdateButton" value="update map"/>
-              <input className="gllpLocationName"/>
-              <div className="FileUpload field" style={{ marginTop: "2%" }}>
-                <label>Upload a photo</label>
-                <Dropzone
-                  style={{ width: "100%", height: "30%", border: "1px solid black", borderStyle: "dashed", borderRadius: "5px" }}
-                  onDrop={this.onImageDrop.bind(this)}
-                  multiple={false}
-                  accept="image/*">
-                  <div style={{ marginLeft: "2%", marginTop: "2%", marginBottom: "2%" }}>Drop an image or click to select a file to upload.</div>
-                </Dropzone>
-              </div>
-
-              <div>
-                {this.state.uploadedFileCloudinaryUrl === '' ? null :
+        <Grid className="centered">
+          <Grid.Row>
+            <Grid.Column width={10}>
+              <Form>
+                <Form.Select 
+                  fluid 
+                  label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='type.occurrence' /></strong>}
+                  onChange={(e, { value }) => this.setState({ type: value })}
+                  options={options}
+                  placeholder='Occurrence type' 
+                />
+                <Form.Input 
+                  label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='name.occurrence' />:</strong>}
+                  onChange={ (e) => this.setState({ title: e.target.value }) }
+                  placeholder='Title'
+                />
+                <Form.TextArea 
+                  label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='description.occurrence' />:</strong>}
+                  onChange={ (e) => this.setState({ description: e.target.value }) }
+                  placeholder='Description'
+                />
+                <div style={{ display: "inline" }}>
+                  <Form.Input 
+                    label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='pick.place' />:</strong>}
+                    onChange={ (e) => this.setState({ search: e.target.value }) }
+                    placeholder='Title'
+                    style={{ width: '80%', float: "left" }}
+                  />
+                  <Button style={{ float: 'right', marginTop: "-9px", marginBottom: "2%", width: "15%" }}secondary type="button" onClick={this.handleAddress.bind(this)}>Search</Button>
+                </div>
+                <Map center={this.state.marker} zoom={4} maxZoom={18} minZoom={2} style={{ height: "400px" }} >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker
+                    draggable={true}
+                    onDragend={this.updatePosition.bind(this)}
+                    position={markerPosition}/>
+                </Map>
+                <input value={this.state.address}/>
+                <div 
+                  className="FileUpload field" 
+                  style={{ marginTop: "2%" }}
+                >
+                  <label><FormattedMessage id='upload.photo' />:</label>
+                  <Dropzone
+                    accept="image/*"
+                    multiple={false}
+                    onDrop={this.onImageDrop}
+                    style={{ width: "100%", height: "30%", border: "1px solid black", borderStyle: "dashed", borderRadius: "5px" }}>
+                    <div style={{ marginLeft: "2%", marginTop: "2%", marginBottom: "2%" }}>
+                      <FormattedMessage id='drop.upload' />
+                    </div>
+                  </Dropzone>
+                </div>
                 <div>
-                  <p><strong>Images: </strong>{this.state.uploadedFile.name}</p>
-                  <center><Image src={this.state.uploadedFileCloudinaryUrl} rounded style={{ maxHeight: "250px" }}/></center>
-                </div>}
-              </div>
-              <Button primary fluid style={{ marginTop: "5%"}} onClick={ this.handleSubmit.bind(this) }>Submit</Button>
-            </fieldset>
-          </Form>
-          <form>
-      </form>
-        </Grid.Column></Grid.Row></Grid>
+                  {this.state.uploadedFileCloudinaryUrl === '' ? null :
+                    <div>
+                      <p>
+                        <strong><FormattedMessage id='images' />: </strong>{this.state.uploadedFile.name}
+                      </p>
+                      <center>
+                        <Image 
+                          rounded 
+                          src={this.state.uploadedFileCloudinaryUrl} 
+                          style={{ maxHeight: "250px" }}
+                        />
+                      </center>
+                    </div>}
+                </div>
+                <Button 
+                  fluid 
+                  onClick={this.handleSubmit} 
+                  primary 
+                  style={{ marginTop: "5%"}}
+                >
+                  <FormattedMessage id='submit' />
+                </Button>
+              </Form>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </Container>
     )
   }

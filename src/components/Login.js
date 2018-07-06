@@ -3,6 +3,23 @@ import { Container, Form, Button, Grid, Tab, Header } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import { withRouter } from "react-router-dom";
 import axios from 'axios';
+import { stringify } from "qs";
+
+import {addLocaleData} from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import fr from 'react-intl/locale-data/fr';
+import es from 'react-intl/locale-data/es';
+import pt from 'react-intl/locale-data/pt';
+import de from 'react-intl/locale-data/de';
+
+addLocaleData([...en, ...fr, ...es, ...pt, ...de]);
+
+import {
+    injectIntl,
+    IntlProvider,
+    FormattedRelative,
+    FormattedMessage
+} from 'react-intl';
 
 class Login extends Component {
 
@@ -17,10 +34,12 @@ class Login extends Component {
       lastNameSU: '',
       passwordSU: '' 
     };
+    this.handleSubmitSignup = this.handleSubmitSignup.bind(this);
+    this.handleSubmitLogin = this.handleSubmitLogin.bind(this);
   }
 
   handleSubmitLogin() {
-    let authTemp = this.state.usernameSI + ":" + this.state.passwordSI;
+    let authTemp = `${this.state.usernameSI}:${this.state.passwordSI}`;
     let auth = new Buffer(authTemp).toString('base64');
     axios.get('http://localhost:5050/login/' + auth)
       .then( (response) => {
@@ -35,12 +54,15 @@ class Login extends Component {
   }
 
   handleSubmitSignup() {
-    axios.post('http://localhost:5050/signup?' + 
-        'username=' + this.state.usernameSU +
-        '&email=' + this.state.mailSU +
-        '&password=' + this.state.passwordSU +
-        '&firstName=' + this.state.firstNameSU +
-        '&lastName=' + this.state.lastNameSU)
+    axios.post('http://localhost:5050/signup', 
+      stringify({
+        username: this.state.usernameSU,
+        email: this.state.mailSU,
+        password: this.state.passwordSU,
+        firstName: this.state.firstNameSU,
+        lastName: this.state.lastNameSU
+      })
+    )
       .then( (response) => {
         console.log(response);
       })
@@ -50,11 +72,10 @@ class Login extends Component {
   }
 
   render () {
-    localStorage.setItem('reload', 'NULL');
     return (
       <Container>
         <Grid centered>
-          <Header as='h1'>Welcome back!</Header>
+          <Header as='h1'><FormattedMessage id='welcome' /></Header>
         </Grid>
         <Grid className="centered">
           <Grid.Row>
@@ -62,24 +83,67 @@ class Login extends Component {
               <Tab 
                 menu={{ secondary: true, pointing: true }} 
                 panes={[{ menuItem: 'Sign In', 
-                render: () => 
-                  <Form>
-                    <Form.Input label='Username' value={ this.state.usernameSI } onChange={ (e) => this.setState({ usernameSI: e.target.value }) }/>
-                    <Form.Input label='Password' value={ this.state.passwordSI } type='password' onChange={ (e) => this.setState({ passwordSI: e.target.value }) }/>
-                    <Button primary onClick={ this.handleSubmitLogin.bind(this) }>Submit</Button>
-                  </Form>
+                  render: () => (
+                    <Form>
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='username' /></strong>}
+                        onChange={(e) => this.setState({ usernameSI: e.target.value })} 
+                        value={this.state.usernameSI}
+                      />
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='password' /></strong>}
+                        onChange={(e) => this.setState({ passwordSI: e.target.value })} 
+                        type='password' 
+                        value={this.state.passwordSI}
+                      />
+                      <Button 
+                        onClick={this.handleSubmitLogin} 
+                        primary
+                      >
+                        <FormattedMessage id='submit' />
+                      </Button>
+                    </Form>
+                  )
                 },
                 { menuItem: 'Sign Up',
-                  render: () => 
+                  render: () => (
                     <Form>
-                      <Form.Input label='Username' value={ this.state.usernameSU } onChange={ (e) => this.setState({ usernameSU: e.target.value }) }/>
-                      <Form.Input label='Email' value={ this.state.mailSU } onChange={ (e) => this.setState({ mailSU: e.target.value }) }/>
-                      <Form.Input label='First Name' value={ this.state.fistNameSU } onChange={ (e) => this.setState({ firstNameSU: e.target.value }) }/>
-                      <Form.Input label='Last Name' value={ this.state.lastNameSU } onChange={ (e) => this.setState({ lastNameSU: e.target.value }) }/>
-                      <Form.Input label='Password' value={ this.state.passwordSU } type='password' onChange={ (e) => this.setState({ passwordSU: e.target.value }) }/>
-                      <Button primary onClick={ this.handleSubmitSignup.bind(this) }>Submit</Button>
-                    </Form> 
-                },]} 
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='username' /></strong>}
+                        onChange={(e) => this.setState({ usernameSU: e.target.value })} 
+                        value={this.state.usernameSU}
+                      />
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='email' /></strong>}
+                        onChange={(e) => this.setState({ mailSU: e.target.value })} 
+                        value={this.state.mailSU}
+                      />
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='first.name' /></strong>}
+                        onChange={(e) => this.setState({ firstNameSU: e.target.value })} 
+                        value={this.state.fistNameSU}
+                      />
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='last.name' /></strong>}
+                        onChange={(e) => this.setState({ lastNameSU: e.target.value })} 
+                        value={this.state.lastNameSU} 
+                      />
+                      <Form.Input 
+                        label={<strong style={{ fontSize: ".92857143em", display: "block", marginBottom: "4px" }}><FormattedMessage id='password' /></strong>}
+                        onChange={(e) => this.setState({ passwordSU: e.target.value })} 
+                        type='password' 
+                        value={this.state.passwordSU} 
+                      />
+                      <Button 
+                        onClick={this.handleSubmitSignup} 
+                        primary
+                      >
+                        <FormattedMessage id='submit' />
+                      </Button>
+                    </Form>
+                  ) 
+                },
+                ]} 
               />
             </Grid.Column>
           </Grid.Row>

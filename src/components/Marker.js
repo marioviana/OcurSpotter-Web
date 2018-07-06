@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Header, Icon, Popup, Button, Grid, Modal, Image } from 'semantic-ui-react';
 import { Link, withRouter } from "react-router-dom";
 import axios from 'axios';
-
+import colorType from '../utils/utils';
 
 class Marker extends Component {
 
@@ -47,46 +47,8 @@ class Marker extends Component {
   }*/
 
   render () {
-    let path = "/occurrences/" + this.state.id;
-    let color = "grey";
-    switch (this.state.type) {
-      case "Animals":
-        color = "blue";
-        break;
-      case "Roads and Signs":
-        color = "red";
-        break;
-      case "Lightning and Energy":
-        color = "orange";
-        break;
-      case "Gardens and Environment":
-        color = "green";
-        break;
-      case "Forest":
-        color = "purple";
-        break;
-      case "Cleansing and conservation":
-        color = "pink";
-        break;
-      case "Pavement and Sidewalks":
-        color = "brown";
-        break;
-      case "Waters and Sewers":
-        color = "olive";
-        break;
-      case "Garbage collection":
-        color = "yellow";
-        break;
-      case "Vehicles":
-        color = "teal";
-        break;
-      case "Suggestion":
-        color = "violet";
-        break;
-      default:
-        color = "grey";
-        break;
-    }
+    let path = `/occurrences/${this.state.id}`;
+    let color = colorType(this.state.type);
     return (
       <Popup
         trigger={<Icon name='map pin' style={{ color: color, fontSize: "20px" }} />}
